@@ -1,23 +1,8 @@
 let userid;
-// $(document).ready(async function () {
-//   await liff.init({ liffId: "1654067025-8gw745KY" }, () => { }, err => console.error(err.code, error.message));
-//   await getUserid();
-//   loadMap();
-// });
-
-// async function getUserid() {
-//   const profile = await liff.getProfile();
-//   userid = await profile.userId;
-//   $('#profile').attr('src', await profile.pictureUrl);
-//   // $('#userId').text(profile.userId);
-//   $('#statusMessage').text(await profile.statusMessage);
-//   $('#displayName').text(await profile.displayName);
-// }
-
 
 function initializeLiff() {
   liff.init({
-    liffId: "1654067025-8gw745KY"
+    liffId: "1654067025-qbv7D0Bn"
   }).then((e) => {
     if (!liff.isLoggedIn()) {
       liff.login();
@@ -38,8 +23,6 @@ async function getUserid() {
   document.getElementById("displayName").innerHTML = await profile.displayName;
   // chkAdmin(profile.userId)
 }
-
-
 
 var map = L.map("map", {
   center: [16.769616, 100.198335],
