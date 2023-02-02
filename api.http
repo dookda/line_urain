@@ -1,0 +1,9 @@
+@minLat = 18.670622
+@minLng = 98.888915
+@maxLat = 18.905708
+@maxLng = 99.165909
+@token = 2b9b7d19f47c41ab2f58a00c0f61315f7a0c5926
+
+
+
+GET https://api.waqi.info/v2/map/bounds?latlng={{minLat}},{{minLng}},{{maxLat}},{{maxLng}}&networks=all&token={{token}}
