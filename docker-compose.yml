@@ -1,0 +1,57 @@
+version: '3.3'
+services:
+  postgis:
+    image: postgis/postgis
+    container_name: urain_postgis
+    restart: always
+    environment:
+      - POSTGRES_DB=maindb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1234
+    volumes:
+      - ./postgres/:/docker-entrypoint-initdb.d
+    ports:
+      - 5433:5432
+
+  nodejs:
+    image: node
+    container_name: urain_nodejs
+    working_dir: /app/nodejs
+    restart: always
+    depends_on:
+      - postgis
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./nodejs:/app/nodejs
+    ports:
+      - 81:3000
+    command: bash -c "npm i && npm i -g nodemon && nodemon server.js"
+
+  react:
+    image: node
+    container_name: urain_reactapp
+    working_dir: /app/reactapp
+    restart: always
+    depends_on:
+      - postgis
+      - nodejs
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./reactapp:/app/reactapp
+    ports:
+      - 81:3000
+    command: bash -c "npm i && npm start"
+  # react:
+  #   container_name: urain_webapp
+  #   build: ./reactapp/
+  #   depends_on:
+  #     - postgis
+  #   environment:
+  #     - NODE_ENV=production
+  #   volumes:
+  #     - ./reactapp:/usr/src/app
+  #   ports:
+  #     - 80:3000
+  #   command: bash -c "npm i && npm i -g nodemon && npm i -g pm2 && nodemon server.js"

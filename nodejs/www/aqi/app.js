@@ -105,7 +105,16 @@ var lc = L.control.locate({
 lc.start();
 
 
-let hpData = axios.get("https://firms.modaps.eosdis.nasa.gov/mapserver/wfs/SouthEast_Asia/c56f7d70bc06160e3c443a592fd9c87e/?SERVICE=WFS&REQUEST=GetFeature&VERSION=2.0.0&TYPENAME=ms:fires_snpp_24hrs&STARTINDEX=0&COUNT=5000&SRSNAME=urn:ogc:def:crs:EPSG::4326&BBOX=-90,-180,90,180,urn:ogc:def:crs:EPSG::4326&outputformat=geojson");
+let minLat = 18.670622
+let minLng = 98.888915
+let maxLat = 18.905708
+let maxLng = 99.165909
+let token = "2b9b7d19f47c41ab2f58a00c0f61315f7a0c5926"
+
+// GET https://api.waqi.info/v2/map/bounds?latlng={{minLat}},{{minLng}},{{maxLat}},{{maxLng}}&networks=all&token={{token}}
+
+
+let hpData = axios.get(`https://api.waqi.info/v2/map/bounds?latlng=${minLat},${minLng},${maxLat},${maxLng}&networks=all&token={{token}}`);
 let onEachFeatureHotspot = (feature, layer) => {
     if (feature.properties) {
         layer.bindPopup(
