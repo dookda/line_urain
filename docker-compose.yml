@@ -25,7 +25,7 @@ services:
     volumes:
       - ./nodejs:/app/nodejs
     ports:
-      - 81:3000
+      - 3500:3000
     command: bash -c "npm i && npm i -g nodemon && nodemon server.js"
 
   react:
@@ -41,7 +41,7 @@ services:
     volumes:
       - ./reactapp:/app/reactapp
     ports:
-      - 81:3000
+      - 3000:3000
     command: bash -c "npm i && npm start"
   # react:
   #   container_name: urain_webapp
