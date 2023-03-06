@@ -152,5 +152,4 @@ var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
 })
 
 
-// initializeLiff()  
-loadMap();
+initializeLiff()  
