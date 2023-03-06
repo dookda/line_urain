@@ -133,6 +133,7 @@ let loadHotspot = async (aqiData) => {
             name: "lyr"
         }).bindPopup(`<div class="kanit"><b>${e.station.name}</b><br/>AQI: ${e.aqi}</div>`).addTo(fc);
     });
+    myModal.hide();
 }
 
 var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
