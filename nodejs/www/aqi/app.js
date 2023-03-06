@@ -73,12 +73,23 @@ function loadMap() {
     }
 
     L.control.layers(baseMap, overLayer).addTo(map);
-    loadHotspot();
 }
 
 function onLocationFound(e) {
-    // console.log(e)
+    console.log(e)
     // gps = L.marker(e.latlng);
+    var point = turf.point([e.latlng.lng, e.latlng.lat]);
+    var buffered = turf.buffer(point, 20, { units: 'kilometers' });
+    var bbox = turf.bbox(buffered);
+    map.fitBounds([
+        [bbox[1], bbox[0]],
+        [bbox[3], bbox[2]]
+    ]);
+
+    let token = "2b9b7d19f47c41ab2f58a00c0f61315f7a0c5926"
+    // GET https://api.waqi.info/v2/map/bounds?latlng={{minLat}},{{minLng}},{{maxLat}},{{maxLng}}&networks=all&token={{token}}
+    let aqiData = axios.get(`https://api.waqi.info/v2/map/bounds?latlng=${bbox[1]},${bbox[0]},${bbox[3]},${bbox[2]}&networks=all&token=${token}`);
+    loadHotspot(aqiData);
 }
 
 function onLocationError(e) {
@@ -105,55 +116,23 @@ var lc = L.control.locate({
 lc.start();
 
 
-let minLat = 18.670622
-let minLng = 98.888915
-let maxLat = 18.905708
-let maxLng = 99.165909
-let token = "2b9b7d19f47c41ab2f58a00c0f61315f7a0c5926"
+let loadHotspot = async (aqiData) => {
+    map.eachLayer(function (layer) {
+        if (layer.options.name == "lyr") {
+            map.removeLayer(layer);
+        }
+    });
 
-// GET https://api.waqi.info/v2/map/bounds?latlng={{minLat}},{{minLng}},{{maxLat}},{{maxLng}}&networks=all&token={{token}}
-
-
-let hpData = axios.get(`https://api.waqi.info/v2/map/bounds?latlng=${minLat},${minLng},${maxLat},${maxLng}&networks=all&token={{token}}`);
-let onEachFeatureHotspot = (feature, layer) => {
-    if (feature.properties) {
-        layer.bindPopup(
-            `<span class="kanit"><b>ตำแหน่งจุดความร้อน</b>
-            <br/>ข้อมูลจาก VIIRS
-            <br/>ตำแหน่งที่พบ : ${feature.properties.latitude}, ${feature.properties.longitude} 
-            <br/>ค่า Brightness temperature: ${feature.properties.brightness} Kelvin
-            <br/>วันที่: ${feature.properties.acq_datetime} UTC`
-        );
-    }
-}
-
-let loadHotspot = async () => {
-    let hp = await hpData;
-    const fs = hp.data.features;
-    var geojsonMarkerOptions = {
-        radius: 6,
-        fillColor: "#ff5100",
-        color: "#a60b00",
-        weight: 0,
-        opacity: 1,
-        fillOpacity: 0.8
-    };
-
-    await L.geoJSON(fs, {
-        filter: function (feature) {
-            if (feature.geometry.coordinates[0] > 96.295861 && feature.geometry.coordinates[0] < 106.113154) {
-                if (feature.geometry.coordinates[1] > 5.157973 && feature.geometry.coordinates[1] < 20.221918) {
-                    myModal.hide();
-                    return feature
-                }
-            }
-        },
-        pointToLayer: function (feature, latlng) {
-            return L.circleMarker(latlng, geojsonMarkerOptions);
-        },
-        name: "lyr",
-        onEachFeature: onEachFeatureHotspot
-    }).addTo(fc)
+    let aqi = await aqiData;
+    aqi.data.data.forEach(e => {
+        var color = e.aqi <= 50 ? "green" : e.aqi <= 100 ? "yellow" : e.aqi <= 150 ? "orange" : e.aqi <= 200 ? "red" : e.aqi <= 300 ? "purple" : "maroon";
+        console.log(color);
+        L.circleMarker([e.lat, e.lon], {
+            radius: 5,
+            color: color,
+            name: "lyr"
+        }).bindPopup(`<div class="kanit"><b>${e.station.name}</b><br/>AQI: ${e.aqi}</div>`).addTo(fc);
+    });
 }
 
 var myModal = new bootstrap.Modal(document.getElementById('myModal'), {

@@ -15,7 +15,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+        integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
     <link rel="stylesheet" href="./style.css">
 </head>
@@ -38,9 +39,7 @@
     </div>
     <div id="map"></div>
     <div class="container">
-        ข้อมูล hotspot เป็นข้อมูลแบบ near real-time โดยอัพเดทข้อมูลทุก 3 ชั่วโมง ซึ่งถูกบันทึกด้วยระบบ MODIS ของดาวเทียม
-        Aqua (A) และ Terra (T) มีความละเอียดเชิงพื้นที่ 1 km และระบบ VIIRS ของดาวเทียม Suomi NPP (N)
-        มีความละเอียดเชิงพื้นที่ 375 m เวลาที่โคจรผ่านภาคเหนือประเทศไทย Aqua 13.42 น. Terra 10.36 น. Suomi NPP 14.2น.
+        ที่มาของข้อมูล https://aqicn.org/
     </div>
 
     <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -63,12 +62,14 @@
         integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
         crossorigin="anonymous"></script>
 
-    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+        integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
 
     <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.js"
         charset="utf-8"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://momentjs.com/downloads/moment-with-locales.js"></script>
+    <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
     <script src="./app.js"></script>
 </body>
 
