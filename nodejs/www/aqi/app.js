@@ -1,6 +1,6 @@
 function initializeLiff() {
     liff.init({
-        liffId: "1654067025-PEA4doYl"
+        liffId: "1654067025-8gw745KY"
     }).then((e) => {
         if (!liff.isLoggedIn()) {
             liff.login();
@@ -140,5 +140,4 @@ var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
 })
 
 
-// initializeLiff()  
-loadMap();
+initializeLiff()  
