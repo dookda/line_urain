@@ -192,6 +192,6 @@ function hideLegend() {
 }
 
 hideLegend();
-// initializeLiff();
-loadMap();
+initializeLiff();
+// loadMap();
 
