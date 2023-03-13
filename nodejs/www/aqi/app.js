@@ -7,7 +7,7 @@ function initializeLiff() {
         } else {
             getUserid();
             loadMap();
-            myModal.show()
+            // myModal.show()
         }
     }).catch((err) => {
         console.log(err);
@@ -142,13 +142,14 @@ let getLBS = (lat, lng) => {
                 L.circleMarker([e.lat, e.lon], {
                     radius: 7,
                     color: color,
-                    name: "lyr"
+                    name: "lyr",
+                    fillOpacity: 0.8
                 }).bindPopup(`<div class="kanit"><b>${e.station.name}</b><br/>AQI: ${e.aqi}</div>`).addTo(fc);
             });
 
         })
 
-    myModal.hide();
+    // myModal.hide();
     axios.get(`https://api.waqi.info/feed/geo:${lat};${lng}/?token=${token}`)
         .then(res => {
             document.getElementById("aqiTxt").innerHTML = `
