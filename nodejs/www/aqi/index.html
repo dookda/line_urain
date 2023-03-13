@@ -41,9 +41,17 @@
     <input type="hidden" id="lng">
     <div id="map"></div>
     <div class="container">
-        <span id="aqiTxt"></span>
         <hr>
-        ที่มาของข้อมูล https://aqicn.org/
+        <div class="toast" id="liveToast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <span id="aqiTxt"></span>
+                </div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+
+        ที่มาของข้อมูล https://aqicn.org/ เวลา <span id="time"></span>
     </div>
 
     <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -58,7 +66,6 @@
             </div>
         </div>
     </div>
-
 
     <!-- JavaScript Bundle with Popper -->
     <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>

@@ -25,24 +25,24 @@ services:
     volumes:
       - ./nodejs:/app/nodejs
     ports:
-      - 3500:3000
+      - 80:3000
     command: bash -c "npm i && npm i -g nodemon && nodemon server.js"
+  # react:
+  #   image: node
+  #   container_name: urain_reactapp
+  #   working_dir: /app/reactapp
+  #   restart: always
+  #   depends_on:
+  #     - postgis
+  #     - nodejs
+  #   environment:
+  #     - NODE_ENV=production
+  #   volumes:
+  #     - ./reactapp:/app/reactapp
+  #   ports:
+  #     - 3000:3000
+  #   command: bash -c "npm i && npm start"
 
-  react:
-    image: node
-    container_name: urain_reactapp
-    working_dir: /app/reactapp
-    restart: always
-    depends_on:
-      - postgis
-      - nodejs
-    environment:
-      - NODE_ENV=production
-    volumes:
-      - ./reactapp:/app/reactapp
-    ports:
-      - 3000:3000
-    command: bash -c "npm i && npm start"
   # react:
   #   container_name: urain_webapp
   #   build: ./reactapp/

@@ -85,15 +85,10 @@ function refreshPage() {
 // map.on("locationfound", onLocationFound);
 map.locate({ setView: true, maxZoom: 14 });
 navigator.geolocation.getCurrentPosition(function (position) {
-    // map.setView([position.coords.latitude, position.coords.longitude], 14);
-    // document.getElementById("lat").value = position.coords.latitude;
-    // document.getElementById("lng").value = position.coords.longitude;
     getLBS(position.coords.latitude, position.coords.longitude);
 });
 
 map.on("click", function (e) {
-    // document.getElementById("lat").value = e.latlng.lat;
-    // document.getElementById("lng").value = e.latlng.lng;
     getLBS(e.latlng.lat, e.latlng.lng);
 });
 
@@ -114,36 +109,37 @@ var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
     keyboard: false,
 })
 
+const toastId = document.querySelector('#liveToast');
+const toastLive = document.getElementById('liveToast')
+const toast = new bootstrap.Toast(toastLive)
+if (toastTrigger) {
+    toastTrigger.addEventListener('click', () => {
+        toast.show()
+    })
+}
+
 let getLBS = (lat, lng) => {
     map.eachLayer(function (layer) {
         if (layer.options.name == "lyr") {
             map.removeLayer(layer);
         }
     });
-    // console.log("getLBS");
-    // let lat = document.getElementById("lat").value;
-    // let lng = document.getElementById("lng").value;
+
     var point = turf.point([Number(lng), Number(lat)]);
     var buffered = turf.buffer(point, 20, { units: 'kilometers' });
     var bbox = turf.bbox(buffered);
-    // map.fitBounds([
-    //     [bbox[1], bbox[0]],
-    //     [bbox[3], bbox[2]]
-    // ]);
 
     let token = "2b9b7d19f47c41ab2f58a00c0f61315f7a0c5926"
     // GET https://api.waqi.info/v2/map/bounds?latlng={{minLat}},{{minLng}},{{maxLat}},{{maxLng}}&networks=all&token={{token}}
     axios.get(`https://api.waqi.info/v2/map/bounds?latlng=${bbox[1]},${bbox[0]},${bbox[3]},${bbox[2]}&networks=all&token=${token}`)
         .then(res => {
-            // console.log(res);
             res.data.data.forEach(e => {
                 var color = e.aqi <= 50 ? "#009966" : e.aqi <= 100 ? "#ffde33" : e.aqi <= 150 ? "#ff9933" : e.aqi <= 200 ? "#cc0033" : e.aqi <= 300 ? "#660099" : "#7e0023";
-                // console.log(color);
                 L.circleMarker([e.lat, e.lon], {
                     radius: 7,
                     color: color,
                     name: "lyr",
-                    fillOpacity: 0.8
+                    fillOpacity: 0.9
                 }).bindPopup(`<div class="kanit"><b>${e.station.name}</b><br/>AQI: ${e.aqi}</div>`).addTo(fc);
             });
 
@@ -152,11 +148,13 @@ let getLBS = (lat, lng) => {
     // myModal.hide();
     axios.get(`https://api.waqi.info/feed/geo:${lat};${lng}/?token=${token}`)
         .then(res => {
-            document.getElementById("aqiTxt").innerHTML = `
-                <span class="badge rounded-pill text-bg-light">aqi: ${res.data.data.aqi}</span> 
-                <span class="badge rounded-pill text-bg-light">pm2.5: ${res.data.data.iaqi.pm25.v}</span>
-                <span class="badge rounded-pill text-bg-light">${res.data.data.time.s}</span>
-            `;
+            toastId.className = "toast";
+            var color = res.data.data.aqi <= 50 ? "bg-aqi-1" : res.data.data.aqi <= 100 ? "bg-aqi-2" : res.data.data.aqi <= 150 ? "bg-aqi-3" : res.data.data.aqi <= 200 ? "bg-aqi-4" : res.data.data.aqi <= 300 ? "bg-aqi-5" : "bg-aqi-6";
+            var text = res.data.data.aqi <= 50 ? "อากาศดี" : res.data.data.aqi <= 100 ? "อากาศดีปานกลาง" : res.data.data.aqi <= 150 ? "อากาศเริ่มไม่ดี" : res.data.data.aqi <= 200 ? "อากาศไม่ดี" : res.data.data.aqi <= 300 ? "อากาศไม่ดีอย่างยิ่ง" : "อันตราย";
+            toastId.classList.add(color);
+            document.getElementById("aqiTxt").innerHTML = `${text}  aqi: ${res.data.data.aqi} pm2.5: ${res.data.data.iaqi.pm25.v}`;
+            toast.show()
+            document.getElementById("time").innerHTML = `${res.data.data.time.s}`
         })
 }
 
@@ -173,7 +171,7 @@ function showLegend() {
         div.innerHTML += '<i style="background: #ffde33"></i><span class="kanit">อากาศดีปานกลาง</span><br>';
         div.innerHTML += '<i style="background: #ff9933"></i><span class="kanit">อากาศเริ่มไม่ดี</span><br>';
         div.innerHTML += '<i style="background: #cc0033"></i><span class="kanit">อากาศไม่ดี</span><br>';
-        div.innerHTML += '<i style="background: #660099"></i><span class="kanit">อากาศไม่มีอย่างยิ่ง</span><br>';
+        div.innerHTML += '<i style="background: #660099"></i><span class="kanit">อากาศไม่ดีอย่างยิ่ง</span><br>';
         div.innerHTML += '<i style="background: #7e0023"></i><span class="kanit">อันตราย</span><br>';
         // div.innerHTML += '<i style="background: #bd0000"></i><span class="kanit">ฝนตกหนักมาก</span><br>';
         return div;
@@ -193,6 +191,7 @@ function hideLegend() {
     legend.addTo(map);
 }
 
-hideLegend()
-initializeLiff()
+hideLegend();
+// initializeLiff();
+loadMap();
 
