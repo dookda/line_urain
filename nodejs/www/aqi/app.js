@@ -143,6 +143,7 @@ let getLBS = (lat, lng) => {
     // myModal.hide();
     axios.get(`https://api.waqi.info/feed/geo:${lat};${lng}/?token=${token}`)
         .then(res => {
+            // console.log(res.data.data);
             toastId.className = "toast";
             var color = res.data.data.aqi <= 50 ? "bg-aqi-1" : res.data.data.aqi <= 100 ? "bg-aqi-2" : res.data.data.aqi <= 150 ? "bg-aqi-3" : res.data.data.aqi <= 200 ? "bg-aqi-4" : res.data.data.aqi <= 300 ? "bg-aqi-5" : "bg-aqi-6";
             var text = res.data.data.aqi <= 50 ? "อากาศดี" : res.data.data.aqi <= 100 ? "อากาศดีปานกลาง" : res.data.data.aqi <= 150 ? "อากาศเริ่มไม่ดี" : res.data.data.aqi <= 200 ? "อากาศไม่ดี" : res.data.data.aqi <= 300 ? "อากาศไม่ดีอย่างยิ่ง" : "อันตราย";
