@@ -112,11 +112,6 @@ var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
 const toastId = document.querySelector('#liveToast');
 const toastLive = document.getElementById('liveToast')
 const toast = new bootstrap.Toast(toastLive)
-if (toastTrigger) {
-    toastTrigger.addEventListener('click', () => {
-        toast.show()
-    })
-}
 
 let getLBS = (lat, lng) => {
     map.eachLayer(function (layer) {
