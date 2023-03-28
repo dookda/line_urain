@@ -145,9 +145,9 @@ let getLBS = (lat, lng) => {
             console.log(res.data.data);
             // toastId.className = "toast";
             var color = res.data.data.aqi <= 50 ? "bg-aqi-1" : res.data.data.aqi <= 100 ? "bg-aqi-2" : res.data.data.aqi <= 150 ? "bg-aqi-3" : res.data.data.aqi <= 200 ? "bg-aqi-4" : res.data.data.aqi <= 300 ? "bg-aqi-5" : "bg-aqi-6";
-            var text = res.data.data.aqi <= 50 ? "อากาศดี" : res.data.data.aqi <= 100 ? "อากาศดีปานกลาง" : res.data.data.aqi <= 150 ? "อากาศเริ่มไม่ดี" : res.data.data.aqi <= 200 ? "อากาศไม่ดี" : res.data.data.aqi <= 300 ? "อากาศไม่ดีอย่างยิ่ง" : "อันตราย";
+            var text = res.data.data.aqi <= 50 ? "อากาศดี" : res.data.data.aqi <= 100 ? "อากาศดีปานกลาง" : res.data.data.aqi <= 150 ? "อากาศเริ่มไม่ดี" : res.data.data.aqi <= 200 ? "อากาศไม่ดี หลีกเลี่ยงกิจกรรมกลางแจ้ง" : res.data.data.aqi <= 300 ? "อากาศไม่ดีอย่างยิ่ง งดกิจกรรมกลางแจ้ง" : "อันตราย งดกิจกรรมกลางแจ้ง";
             // toastId.classList.add(color);
-            document.getElementById("aqiTxt").innerHTML = `<div class="shadow-sm p-1 mt-2 ${color} rounded">${text}  aqi: ${res.data.data.aqi} pm2.5: ${res.data.data.iaqi.pm25.v}</div>`;
+            document.getElementById("aqiTxt").innerHTML = `<div class="shadow-sm p-2 mt-2 ${color} rounded">${text}  aqi: ${res.data.data.aqi} pm2.5: ${res.data.data.iaqi.pm25.v}</div>`;
             document.getElementById("time").innerHTML = `${res.data.data.time.s}`
         })
 }

@@ -108,29 +108,35 @@ tr td:last-child {
 .bg-aqi-1 {
     background-color: #009966;
     color: #fff;
+    font-size: 14px;
 }
 
 .bg-aqi-2 {
     background-color: #ffde33;
     color: #fff;
+    font-size: 14px;
 }
 
 .bg-aqi-3 {
     background-color: #ff9933;
     color: #fff;
+    font-size: 14px;
 }
 
 .bg-aqi-4 {
     background-color: #cc0033;
     color: #fff;
+    font-size: 14px;
 }
 
 .bg-aqi-5 {
     background-color: #660099;
     color: #fff;
+    font-size: 14px;
 }
 
 .bg-aqi-6 {
     background-color: #7e0023;
     color: #fff;
+    font-size: 14px;
 }
