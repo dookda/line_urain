@@ -31,8 +31,8 @@ var map = L.map("map", {
 var fc = L.featureGroup()
 
 function loadMap() {
-    var mapbox = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-        maxZoom: 18,
+    var mapbox = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZG9va2RhIiwiYSI6ImNsZmxvenZsYzAzY3IzcW1tZmRyNTZiZDkifQ.m2CpYfFxxSZ0QriDK7s7Dw', {
+        maxZoom: 20,
         id: 'mapbox/light-v9',
         tileSize: 512,
         zoomOffset: -1
