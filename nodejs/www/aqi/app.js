@@ -127,29 +127,42 @@ let getLBS = (lat, lng) => {
     // GET https://api.waqi.info/v2/map/bounds?latlng={{minLat}},{{minLng}},{{maxLat}},{{maxLng}}&networks=all&token={{token}}
     axios.get(`https://api.waqi.info/v2/map/bounds?latlng=${bbox[1]},${bbox[0]},${bbox[3]},${bbox[2]}&networks=all&token=${token}`)
         .then(res => {
-            res.data.data.forEach(e => {
-                var color = e.aqi <= 50 ? "#009966" : e.aqi <= 100 ? "#ffde33" : e.aqi <= 150 ? "#ff9933" : e.aqi <= 200 ? "#cc0033" : e.aqi <= 300 ? "#660099" : "#7e0023";
+            // let json = [];
+            let json = res.data.data.map(e => {
+                // console.log(e);
+                let color = e.aqi <= 50 ? "#009966" : e.aqi <= 100 ? "#ffde33" : e.aqi <= 150 ? "#ff9933" : e.aqi <= 200 ? "#cc0033" : e.aqi <= 300 ? "#660099" : "#7e0023";
+                let colorTxt = res.data.data.aqi <= 50 ? "bg-aqi-1" : res.data.data.aqi <= 100 ? "bg-aqi-2" : res.data.data.aqi <= 150 ? "bg-aqi-3" : res.data.data.aqi <= 200 ? "bg-aqi-4" : res.data.data.aqi <= 300 ? "bg-aqi-5" : "bg-aqi-6";
+                let text = res.data.data.aqi <= 50 ? "อากาศดี" : res.data.data.aqi <= 100 ? "อากาศดีปานกลาง" : res.data.data.aqi <= 150 ? "อากาศเริ่มไม่ดี" : res.data.data.aqi <= 200 ? "อากาศไม่ดี หลีกเลี่ยงกิจกรรมกลางแจ้ง" : res.data.data.aqi <= 300 ? "อากาศไม่ดีอย่างยิ่ง งดกิจกรรมกลางแจ้ง" : "อันตราย งดกิจกรรมกลางแจ้ง";
+                let distance = turf.distance(point, turf.point([e.lon, e.lat]), { units: 'kilometers' });
+
                 L.circleMarker([e.lat, e.lon], {
                     radius: 7,
                     color: color,
                     name: "lyr",
                     fillOpacity: 0.9
                 }).bindPopup(`<div class="kanit"><b>${e.station.name}</b><br/>AQI: ${e.aqi}</div>`).addTo(fc);
+                return { color, colorTxt, text, distance, aqi: e.aqi, stname: e.station.name, time: e.station.time }
             });
+
+            json.sort(function (a, b) {
+                return a.distance - b.distance;
+            });
+
+            // console.log(json);
+            document.getElementById("aqiTxt").innerHTML = `<div class="shadow-sm p-2 mt-2 mb-2 ${json[0].colorTxt} rounded">${json[0].text}  <br>aqi: ${json[0].aqi} ของสถานี: ${json[0].stname} </div>`;
+            document.getElementById("time").innerHTML = `${json[0].time}`;
 
         })
 
     // myModal.hide();
-    axios.get(`https://api.waqi.info/feed/geo:${lat};${lng}/?token=${token}`)
-        .then(res => {
-            console.log(res.data.data);
-            // toastId.className = "toast";
-            var color = res.data.data.aqi <= 50 ? "bg-aqi-1" : res.data.data.aqi <= 100 ? "bg-aqi-2" : res.data.data.aqi <= 150 ? "bg-aqi-3" : res.data.data.aqi <= 200 ? "bg-aqi-4" : res.data.data.aqi <= 300 ? "bg-aqi-5" : "bg-aqi-6";
-            var text = res.data.data.aqi <= 50 ? "อากาศดี" : res.data.data.aqi <= 100 ? "อากาศดีปานกลาง" : res.data.data.aqi <= 150 ? "อากาศเริ่มไม่ดี" : res.data.data.aqi <= 200 ? "อากาศไม่ดี หลีกเลี่ยงกิจกรรมกลางแจ้ง" : res.data.data.aqi <= 300 ? "อากาศไม่ดีอย่างยิ่ง งดกิจกรรมกลางแจ้ง" : "อันตราย งดกิจกรรมกลางแจ้ง";
-            // toastId.classList.add(color);
-            document.getElementById("aqiTxt").innerHTML = `<div class="shadow-sm p-2 mt-2 ${color} rounded">${text}  aqi: ${res.data.data.aqi} pm2.5: ${res.data.data.iaqi.pm25.v}</div>`;
-            document.getElementById("time").innerHTML = `${res.data.data.time.s}`
-        })
+    // axios.get(`https://api.waqi.info/feed/geo:${lat};${lng}/?token=${token}`)
+    //     .then(res => {
+    //         console.log(res.data.data);
+    //         var color = res.data.data.aqi <= 50 ? "bg-aqi-1" : res.data.data.aqi <= 100 ? "bg-aqi-2" : res.data.data.aqi <= 150 ? "bg-aqi-3" : res.data.data.aqi <= 200 ? "bg-aqi-4" : res.data.data.aqi <= 300 ? "bg-aqi-5" : "bg-aqi-6";
+    //         var text = res.data.data.aqi <= 50 ? "อากาศดี" : res.data.data.aqi <= 100 ? "อากาศดีปานกลาง" : res.data.data.aqi <= 150 ? "อากาศเริ่มไม่ดี" : res.data.data.aqi <= 200 ? "อากาศไม่ดี หลีกเลี่ยงกิจกรรมกลางแจ้ง" : res.data.data.aqi <= 300 ? "อากาศไม่ดีอย่างยิ่ง งดกิจกรรมกลางแจ้ง" : "อันตราย งดกิจกรรมกลางแจ้ง";
+    //         document.getElementById("aqiTxt").innerHTML = `<div class="shadow-sm p-2 mt-2 mb-2 ${color} rounded">${text}  <br>aqi: ${res.data.data.aqi} pm2.5: ${res.data.data.iaqi.pm25.v}</div>`;
+    //         document.getElementById("time").innerHTML = `${res.data.data.time.s}`
+    //     })
 }
 
 var legend = L.control({ position: "bottomleft" });
