@@ -68,14 +68,14 @@ function loadMap() {
     L.control.layers(baseMap, overLayer).addTo(map);
 }
 
-function onLocationFound(e) {
-    document.getElementById("lat").value = e.latlng.lat;
-    document.getElementById("lng").value = e.latlng.lng;
-}
+// function onLocationFound(e) {
+//     document.getElementById("lat").value = e.latlng.lat;
+//     document.getElementById("lng").value = e.latlng.lng;
+// }
 
-function onLocationError(e) {
-    console.log(e.message);
-}
+// function onLocationError(e) {
+//     console.log(e.message);
+// }
 
 function refreshPage() {
     location.reload(true);
@@ -84,6 +84,9 @@ function refreshPage() {
 // map.on("locationfound", onLocationFound);
 map.locate({ setView: true, maxZoom: 14 });
 navigator.geolocation.getCurrentPosition(function (position) {
+
+    document.getElementById("lat").value = position.coords.latitude;
+    document.getElementById("lng").value = position.coords.longitude;
     getLBS(position.coords.latitude, position.coords.longitude);
 });
 
@@ -91,18 +94,18 @@ map.on("click", function (e) {
     getLBS(e.latlng.lat, e.latlng.lng);
 });
 
-var lc = L.control.locate({
-    position: "topleft",
-    strings: {
-        title: "enable gps"
-    },
-    locateOptions: {
-        maxZoom: 18,
-        enableHighAccuracy: true
-    }
-}).addTo(map);
+// var lc = L.control.locate({
+//     position: "topleft",
+//     strings: {
+//         title: "enable gps"
+//     },
+//     locateOptions: {
+//         maxZoom: 18,
+//         enableHighAccuracy: true
+//     }
+// }).addTo(map);
 
-lc.start();
+// lc.start();
 
 var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
     keyboard: false,
@@ -131,8 +134,8 @@ let getLBS = (lat, lng) => {
             let json = res.data.data.map(e => {
                 // console.log(e);
                 let color = e.aqi <= 50 ? "#009966" : e.aqi <= 100 ? "#ffde33" : e.aqi <= 150 ? "#ff9933" : e.aqi <= 200 ? "#cc0033" : e.aqi <= 300 ? "#660099" : "#7e0023";
-                let colorTxt = res.data.data.aqi <= 50 ? "bg-aqi-1" : res.data.data.aqi <= 100 ? "bg-aqi-2" : res.data.data.aqi <= 150 ? "bg-aqi-3" : res.data.data.aqi <= 200 ? "bg-aqi-4" : res.data.data.aqi <= 300 ? "bg-aqi-5" : "bg-aqi-6";
-                let text = res.data.data.aqi <= 50 ? "อากาศดี" : res.data.data.aqi <= 100 ? "อากาศดีปานกลาง" : res.data.data.aqi <= 150 ? "อากาศเริ่มไม่ดี" : res.data.data.aqi <= 200 ? "อากาศไม่ดี หลีกเลี่ยงกิจกรรมกลางแจ้ง" : res.data.data.aqi <= 300 ? "อากาศไม่ดีอย่างยิ่ง งดกิจกรรมกลางแจ้ง" : "อันตราย งดกิจกรรมกลางแจ้ง";
+                let colorTxt = e.aqi <= 50 ? "bg-aqi-1" : e.aqi <= 100 ? "bg-aqi-2" : e.aqi <= 150 ? "bg-aqi-3" : e.aqi <= 200 ? "bg-aqi-4" : e.aqi <= 300 ? "bg-aqi-5" : "bg-aqi-6";
+                let text = e.aqi <= 50 ? "อากาศดี" : e.aqi <= 100 ? "อากาศดีปานกลาง" : e.aqi <= 150 ? "อากาศเริ่มไม่ดี" : e.aqi <= 200 ? "อากาศไม่ดี หลีกเลี่ยงกิจกรรมกลางแจ้ง" : e.aqi <= 300 ? "อากาศไม่ดีอย่างยิ่ง งดกิจกรรมกลางแจ้ง" : "อันตราย งดกิจกรรมกลางแจ้ง";
                 let distance = turf.distance(point, turf.point([e.lon, e.lat]), { units: 'kilometers' });
 
                 L.circleMarker([e.lat, e.lon], {
