@@ -68,10 +68,11 @@ function loadMap() {
     L.control.layers(baseMap, overLayer).addTo(map);
 }
 
-// function onLocationFound(e) {
-//     document.getElementById("lat").value = e.latlng.lat;
-//     document.getElementById("lng").value = e.latlng.lng;
-// }
+function onLocationFound(e) {
+    document.getElementById("lat").value = e.latlng.lat;
+    document.getElementById("lng").value = e.latlng.lng;
+    getLBS(e.latlng.lat, e.latlng.lng);
+}
 
 // function onLocationError(e) {
 //     console.log(e.message);
@@ -84,7 +85,6 @@ function refreshPage() {
 // map.on("locationfound", onLocationFound);
 map.locate({ setView: true, maxZoom: 14 });
 navigator.geolocation.getCurrentPosition(function (position) {
-
     document.getElementById("lat").value = position.coords.latitude;
     document.getElementById("lng").value = position.coords.longitude;
     getLBS(position.coords.latitude, position.coords.longitude);
@@ -94,18 +94,18 @@ map.on("click", function (e) {
     getLBS(e.latlng.lat, e.latlng.lng);
 });
 
-// var lc = L.control.locate({
-//     position: "topleft",
-//     strings: {
-//         title: "enable gps"
-//     },
-//     locateOptions: {
-//         maxZoom: 18,
-//         enableHighAccuracy: true
-//     }
-// }).addTo(map);
+var lc = L.control.locate({
+    position: "topleft",
+    strings: {
+        title: "enable gps"
+    },
+    locateOptions: {
+        maxZoom: 18,
+        enableHighAccuracy: true
+    }
+}).addTo(map);
 
-// lc.start();
+lc.start();
 
 var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
     keyboard: false,
