@@ -26,9 +26,9 @@
         <!-- See a list of Mapbox-hosted public styles at -->
         <!-- https://docs.mapbox.com/api/maps/styles/#mapbox-styles -->
         <label for="satellite-streets-v12">satellite</label>
-        <input id="light-v11" type="radio" name="rtoggle" value="light" checked>
+        <input id="light-v11" type="radio" name="rtoggle" value="light">
         <label for="light-v11">light</label>
-        <input id="dark-v11" type="radio" name="rtoggle" value="dark">
+        <input id="dark-v11" type="radio" name="rtoggle" value="dark" checked>
         <label for="dark-v11">dark</label>
         <input id="streets-v12" type="radio" name="rtoggle" value="streets">
         <label for="streets-v12">streets</label>
@@ -40,7 +40,7 @@
         mapboxgl.accessToken = "pk.eyJ1IjoiZG9va2RhIiwiYSI6ImNsZHB6anMxazE4YXQzem9sMzN2YmEyNWQifQ.eiVJh26nIetp8sMo_UIJkw";
         const map = new mapboxgl.Map({
             container: "map",
-            style: 'mapbox://styles/mapbox/light-v11', // Choose one style
+            style: 'mapbox://styles/mapbox/dark-v11', // Choose one style
             zoom: 6,
             center: [100, 17],
             pitch: 45
@@ -76,44 +76,63 @@
         });
         map.addControl(gps, 'bottom-right');
 
+
+
         // RainViewer integration
-        function addRainViewerLayer() {
-            fetch("https://api.rainviewer.com/public/weather-maps.json")
+        function addHotspotLayer() {
+            fetch("https://firms.modaps.eosdis.nasa.gov/mapserver/wfs/SouthEast_Asia/c56f7d70bc06160e3c443a592fd9c87e/?SERVICE=WFS&REQUEST=GetFeature&VERSION=2.0.0&TYPENAME=ms:fires_snpp_24hrs&STARTINDEX=0&COUNT=10000&SRSNAME=urn:ogc:def:crs:EPSG::4326&BBOX=-90,-180,90,180,urn:ogc:def:crs:EPSG::4326&outputformat=geojson")
                 .then(res => res.json())
                 .then(apiData => {
-                    const latestFrame = apiData.radar.past[apiData.radar.past.length - 1];
-                    const layerId = `rainviewer_${latestFrame.path}`;
+                    map.addSource('hotspot', {
+                        type: 'geojson',
+                        data: apiData,
+                    });
 
-                    if (map.getLayer(layerId)) {
-                        // If the layer already exists, update its source instead of re-adding it
-                        // map.getSource(layerId).setData(apiData.host + latestFrame.path + '/256/{z}/{x}/{y}/2/1_1.png');
-                    } else {
-                        map.addLayer({
-                            id: layerId,
-                            type: "raster",
-                            source: {
-                                type: "raster",
-                                tiles: [apiData.host + latestFrame.path + '/256/{z}/{x}/{y}/2/1_1.png'],
-                                tileSize: 256
-                            },
-                            layout: { visibility: "visible" },
-                            minzoom: 0,
-                            maxzoom: 12
-                        });
-                    }
+                    map.addLayer({
+                        id: 'hotspot',
+                        type: 'circle',
+                        source: 'hotspot',
+                        layout: {
+                            visibility: 'visible'
+                        },
+                        paint: {
+                            'circle-radius': 5,
+                            'circle-color': '#fc0303'
+                        },
+                    });
+
+                    // Add click event to the layer
+                    map.on('click', 'hotspot', function (e) {
+                        while (Math.abs(e.lngLat.lng - e.features[0].geometry.coordinates[0]) > 180) {
+                            e.lngLat.lng += e.lngLat.lng > e.features[0].geometry.coordinates[0] ? -360 : 360;
+                        }
+
+                        new mapboxgl.Popup()
+                            .setLngLat(e.lngLat)
+                            .setHTML(`พิกัด: ${JSON.stringify(e.features[0].properties.latitude)}, ${JSON.stringify(e.features[0].properties.longitude)}<br>
+                                       ค่า brightness:  ${JSON.stringify(e.features[0].properties.brightness)}<br>
+                                       วัน/เวลา: ${JSON.stringify(e.features[0].properties.acq_datetime)}<br>`)
+                            .addTo(map);
+                    });
+
+                    // Change the cursor to a pointer when the mouse is over the clusters layer.
+                    map.on('mouseenter', 'clusters', function () {
+                        map.getCanvas().style.cursor = 'pointer';
+                    });
+
+                    // Change it back to a pointer when it leaves.
+                    map.on('mouseleave', 'clusters', function () {
+                        map.getCanvas().style.cursor = '';
+                    });
                 })
                 .catch(console.error);
         }
 
-        // Add initial RainViewer layer & GeoLocate
         map.on('load', () => {
             gps.trigger();
-            addRainViewerLayer();
         });
 
-
-        // Reapply RainViewer layer when the style changes
-        map.on('style.load', addRainViewerLayer);
+        map.on('style.load', addHotspotLayer);
 
     </script>
 </body>
