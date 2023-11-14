@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>RainViewer API Example for Mapbox</title>
+    <title>จุดความร้อน</title>
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
@@ -22,13 +22,13 @@
 <body style="margin: 0px; padding: 0px;">
     <div id="map" style="position: absolute; top: 0px; bottom: 0px; width: 100%;"></div>
     <div id="menu">
-        <input id="satellite-streets-v12" type="radio" name="rtoggle" value="satellite" checked="checked">
+        <input id="satellite-streets-v12" type="radio" name="rtoggle" value="satellite">
         <!-- See a list of Mapbox-hosted public styles at -->
         <!-- https://docs.mapbox.com/api/maps/styles/#mapbox-styles -->
         <label for="satellite-streets-v12">satellite</label>
-        <input id="light-v11" type="radio" name="rtoggle" value="light">
+        <input id="light-v11" type="radio" name="rtoggle" value="light" checked>
         <label for="light-v11">light</label>
-        <input id="dark-v11" type="radio" name="rtoggle" value="dark" checked>
+        <input id="dark-v11" type="radio" name="rtoggle" value="dark">
         <label for="dark-v11">dark</label>
         <input id="streets-v12" type="radio" name="rtoggle" value="streets">
         <label for="streets-v12">streets</label>
@@ -40,7 +40,7 @@
         mapboxgl.accessToken = "pk.eyJ1IjoiZG9va2RhIiwiYSI6ImNsZmxvenZsYzAzY3IzcW1tZmRyNTZiZDkifQ.m2CpYfFxxSZ0QriDK7s7Dw";
         const map = new mapboxgl.Map({
             container: "map",
-            style: 'mapbox://styles/mapbox/dark-v11', // Choose one style
+            style: 'mapbox://styles/mapbox/light-v11', // Choose one style
             zoom: 6,
             center: [100, 17],
             pitch: 45
@@ -88,13 +88,65 @@
                         data: apiData,
                     });
 
+                    map.addLayer(
+                        {
+                            'id': 'hotspot-heat',
+                            'type': 'heatmap',
+                            'source': 'hotspot',
+                            'maxzoom': 8,
+                            'paint': {
+                                // increase weight as diameter breast height increases
+                                'heatmap-weight': {
+                                    'property': 'dbh',
+                                    'type': 'exponential',
+                                    'stops': [
+                                        [1, 0],
+                                        [62, 1]
+                                    ]
+                                },
+                                // increase intensity as zoom level increases
+                                'heatmap-intensity': {
+                                    'stops': [
+                                        [11, 1],
+                                        [15, 3]
+                                    ]
+                                },
+                                // use sequential color palette to use exponentially as the weight increases
+                                'heatmap-color': [
+                                    'interpolate',
+                                    ['linear'],
+                                    ['heatmap-density'],
+                                    0, 'rgba(29,72,119,0)',
+                                    0.2, '#1b8a5a',
+                                    0.4, '#fbb021',
+                                    0.6, '#f68838',
+                                    0.8, '#ee3e32'
+                                ],
+                                // increase radius as zoom increases
+                                'heatmap-radius': {
+                                    'stops': [
+                                        [11, 15],
+                                        [15, 20]
+                                    ]
+                                },
+                                // decrease opacity to transition into the circle layer
+                                'heatmap-opacity': {
+                                    'default': 1,
+                                    'stops': [
+                                        [14, 1],
+                                        [15, 0]
+                                    ]
+                                }
+                            }
+                        },
+                        'waterway-label'
+                    );
+
                     map.addLayer({
-                        id: 'hotspot',
+                        id: 'hotspot-point',
                         type: 'circle',
                         source: 'hotspot',
-                        layout: {
-                            visibility: 'visible'
-                        },
+                        minzoom: 8,
                         paint: {
                             'circle-radius': 5,
                             'circle-color': '#fc0303'
@@ -102,7 +154,7 @@
                     });
 
                     // Add click event to the layer
-                    map.on('click', 'hotspot', function (e) {
+                    map.on('click', 'hotspot-point', function (e) {
                         while (Math.abs(e.lngLat.lng - e.features[0].geometry.coordinates[0]) > 180) {
                             e.lngLat.lng += e.lngLat.lng > e.features[0].geometry.coordinates[0] ? -360 : 360;
                         }
@@ -116,12 +168,12 @@
                     });
 
                     // Change the cursor to a pointer when the mouse is over the clusters layer.
-                    map.on('mouseenter', 'clusters', function () {
+                    map.on('mouseenter', 'hotspot-point', function () {
                         map.getCanvas().style.cursor = 'pointer';
                     });
 
                     // Change it back to a pointer when it leaves.
-                    map.on('mouseleave', 'clusters', function () {
+                    map.on('mouseleave', 'hotspot-point', function () {
                         map.getCanvas().style.cursor = '';
                     });
                 })
@@ -129,7 +181,7 @@
         }
 
         map.on('load', () => {
-            gps.trigger();
+            // gps.trigger();
         });
 
         map.on('style.load', addHotspotLayer);
