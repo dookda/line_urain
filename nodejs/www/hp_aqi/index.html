@@ -76,8 +76,6 @@
         });
         map.addControl(gps, 'bottom-right');
 
-
-
         // RainViewer integration
         function addHotspotLayer() {
             fetch("https://firms.modaps.eosdis.nasa.gov/mapserver/wfs/SouthEast_Asia/c56f7d70bc06160e3c443a592fd9c87e/?SERVICE=WFS&REQUEST=GetFeature&VERSION=2.0.0&TYPENAME=ms:fires_snpp_24hrs&STARTINDEX=0&COUNT=10000&SRSNAME=urn:ogc:def:crs:EPSG::4326&BBOX=-90,-180,90,180,urn:ogc:def:crs:EPSG::4326&outputformat=geojson")
@@ -177,8 +175,93 @@
                     map.on('mouseleave', 'hotspot-point', function () {
                         map.getCanvas().style.cursor = '';
                     });
+
+                    addAqiLayer();
                 })
                 .catch(console.error);
+        }
+
+        function addAqiLayer() {
+            fetch("https://www-old.cmuccdc.org/api2/dustboy/near/18.8029041/98.9502311/")
+                .then(response => response.json())
+                .then(async (apiData) => {
+                    console.log(apiData);
+
+
+
+                    let geojson = {
+                        type: 'FeatureCollection',
+                        features: []
+                    };
+
+                    await apiData.forEach(e => {
+                        geojson.features.push({
+                            type: 'Feature',
+                            properties: {
+                                aqi: Number(e.th_aqi),
+                                name: e.dustboy_name,
+                                time: e.log_datetime,
+                                lat: Number(e.dustboy_lat),
+                                lng: Number(e.dustboy_lon)
+                            },
+                            geometry: {
+                                type: 'Point',
+                                coordinates: [e.dustboy_lon, Number(e.dustboy_lat)]
+                            }
+                        });
+                    });
+
+                    map.addSource('aqi', {
+                        type: 'geojson',
+                        data: geojson,
+                    });
+
+                    map.addLayer({
+                        id: 'aqi',
+                        type: 'circle',
+                        source: 'aqi',
+                        layout: {
+                            visibility: 'visible'
+                        },
+                        paint: {
+                            'circle-radius': 7,
+                            'circle-stroke-width': 2,
+                            'circle-stroke-color': '#fff',
+                            'circle-color': [
+                                'case',
+                                ['<=', ['get', 'aqi'], 50], '#00E400',    // Green for AQI 0-50
+                                ['<=', ['get', 'aqi'], 100], '#FFFF00',   // Yellow for AQI 51-100
+                                ['<=', ['get', 'aqi'], 150], '#FF7E00',   // Orange for AQI 101-150
+                                ['<=', ['get', 'aqi'], 200], '#FF0000',   // Red for AQI 151-200
+                                ['<=', ['get', 'aqi'], 300], '#8F3F97',    // Purple for AQI 201-300
+                                '#7E0023'                                      // Maroon for AQI 301-500
+                            ]
+                        },
+                    });
+
+                    // Add click event to the layer
+                    map.on('click', 'aqi', function (e) {
+                        while (Math.abs(e.lngLat.lng - e.features[0].geometry.coordinates[0]) > 180) {
+                            e.lngLat.lng += e.lngLat.lng > e.features[0].geometry.coordinates[0] ? -360 : 360;
+                        }
+
+                        new mapboxgl.Popup()
+                            .setLngLat(e.lngLat)
+                            .setHTML(`พิกัด: ${JSON.stringify(e.features[0].properties.lat)}, ${JSON.stringify(e.features[0].properties.lng)}<br>
+                                       ค่า aqi:  ${JSON.stringify(e.features[0].properties.aqi)}<br>
+                                       วัน/เวลา: ${JSON.stringify(e.features[0].properties.time)}<br>`)
+                            .addTo(map);
+                    });
+
+                    map.on('mouseenter', 'aqi', function () {
+                        map.getCanvas().style.cursor = 'pointer';
+                    });
+
+                    map.on('mouseleave', 'aqi', function () {
+                        map.getCanvas().style.cursor = '';
+                    });
+                })
+                .catch(error => console.log('error', error));
         }
 
         map.on('load', () => {
